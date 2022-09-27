@@ -1,15 +1,19 @@
+#include "ncurses_display.h"
+
 #include <curses.h>
+
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "format.h"
-#include "ncurses_display.h"
 #include "system.h"
 
 using std::string;
 using std::to_string;
+
+
 
 // 50 bars uniformly displayed from 0 - 100 %
 // 2% is one bar(|)
@@ -93,6 +97,7 @@ void NCursesDisplay::Display(System& system, int n) {
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
+      curs_set(0);
 
   while (1) {
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
