@@ -5,34 +5,28 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 using std::stof;
 using std::string;
 using std::to_string;
 using std::vector;
 
+namespace fs = std::filesystem;
+
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
+string os, version, kernel;
   string line;
-  string key;
-  string value;
-  std::ifstream filestream(kOSPath);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
-      std::replace(line.begin(), line.end(), ' ', '_');
-      std::replace(line.begin(), line.end(), '=', ' ');
-      std::replace(line.begin(), line.end(), '"', ' ');
-      std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
-          std::replace(value.begin(), value.end(), '_', ' ');
-          return value;
-        }
-      }
-    }
+  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kVersionFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    linestream >> os >> version >> kernel;
   }
-  return value;
-}
+  return os;
+  }
+
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::Kernel() {
@@ -47,28 +41,32 @@ string LinuxParser::Kernel() {
   return kernel;
 }
 
+
 // BONUS: Update this to use std::filesystem
+// Take 2 with std::filesystem
+
 vector<int> LinuxParser::Pids() {
   vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
-  struct dirent* file;
-  while ((file = readdir(directory)) != nullptr) {
+  fs::path dir = kProcDirectory;
+for (const auto& entry : fs::directory_iterator(dir)){
+  // while (fs::exists(entry)) {
     // Is this a directory?
-    if (file->d_type == DT_DIR) {
+    if (fs::is_directory(dir)) {
       // Is every character of the name a digit?
-      string filename(file->d_name);
+      std::string filename = entry.path().filename().string();
       if (std::all_of(filename.begin(), filename.end(), isdigit)) {
         int pid = stoi(filename);
         pids.push_back(pid);
       }
     }
   }
-  closedir(directory);
   return pids;
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { string line;
+float LinuxParser::MemoryUtilization() { 
+  
+  string line;
   std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename);
   float memAvailable, memTotal;
   int found {0};
@@ -88,7 +86,8 @@ float LinuxParser::MemoryUtilization() { string line;
         if (found >= 2){break;}
 }
   }
-  return memAvailable/memTotal; }
+
+  return (1 - memAvailable/memTotal); }
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { 
@@ -120,7 +119,7 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { return Pids().size(); }
 
 // TODO: Read and return the number of running processes
 int LinuxParser::RunningProcesses() { return 0; }
