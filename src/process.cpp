@@ -74,8 +74,8 @@ string Process::Ram() {
 // TODO: Return the user (name) that generated this process
 string Process::User() { 
   std::string user = LinuxParser::User(pid_);
-  
-  return LinuxParser::FindUserName(user);
+ 
+  return fmt::format("{:<8}",LinuxParser::FindUserName(user));
  }
 
 // TODO: Return the age of this process (in seconds)
