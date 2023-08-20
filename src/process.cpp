@@ -4,6 +4,7 @@
 #include <format.h>
 #include <linux_parser.h>
 #include <unistd.h>
+#include <system.h>
 
 #include <cctype>
 #include <sstream>
@@ -71,7 +72,11 @@ string Process::Ram() {
 }
 
 // TODO: Return the user (name) that generated this process
-string Process::User() { return LinuxParser::User(pid_); }
+string Process::User() { 
+  std::string user = LinuxParser::User(pid_);
+  
+  return LinuxParser::FindUserName(user);
+ }
 
 // TODO: Return the age of this process (in seconds)
 long int Process::UpTime() { return LinuxParser::UpTime(pid_); }

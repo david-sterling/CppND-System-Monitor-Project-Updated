@@ -60,6 +60,7 @@ long ActiveJiffies();
 long ActiveJiffies(int pid);
 long IdleJiffies();
 void ReadAggregatedJiffies(std::array<long, 10>& jiffies);
+std::string FindUserName(std::string user);
 
 // Processes
 std::string Command(int pid);

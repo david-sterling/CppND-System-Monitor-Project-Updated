@@ -78,3 +78,12 @@ int System::TotalProcesses() { return LinuxParser::TotalProcesses(); }
 
 //TODO: Return the number of seconds since the system started running
 long int System::UpTime() { return LinuxParser::UpTime(); }
+
+std::string System::FindUser(std::string uid){
+
+  if (users_.find(uid) == users_.end()){
+    return "Unknown" ;}
+  else{
+  return users_[uid];
+  }
+}

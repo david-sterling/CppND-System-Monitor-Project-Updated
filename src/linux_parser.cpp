@@ -215,7 +215,7 @@ int LinuxParser::RunningProcesses() {
       int i{1};
       string token{};
       while (tokenizer >> token) {
-        if (i == 3) { //(3) state  %c
+        if (i == 3) {  //(3) state  %c
           if (token == "R") {
             runningProcesses++;
           };
@@ -305,7 +305,6 @@ string LinuxParser::User(int pid) {
     return "";
 }
 
-
 long LinuxParser::UpTime(int pid) {
   string line;
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatFilename);
@@ -323,4 +322,33 @@ long LinuxParser::UpTime(int pid) {
   }
 
   return 0;
+}
+
+std::string LinuxParser::FindUserName(std::string user) {
+  string line;
+  std::ifstream stream(kPasswordPath);
+  string username, uid{};
+  if (stream.is_open()) {
+    string identifier, value;
+    while (std::getline(stream, line)) {
+      string token{};
+      int i{1};
+      std::istringstream ss(line);
+      while (std::getline(ss, token, ':')) {
+          if (i == 1) {
+            username = token;
+          }
+          if (i == 3) {
+            if (token == user) {
+              return username;
+            }
+            else{break;}
+          }
+          i++;
+        }
+      }
+    }
+  
+
+  return "Unknown";
 }
