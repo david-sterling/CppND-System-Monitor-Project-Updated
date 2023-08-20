@@ -7,10 +7,12 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "process.h"
 #include "processor.h"
 #include "linux_parser.h"
+
 
 using std::set;
 using std::size_t;
@@ -21,19 +23,43 @@ using std::vector;
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() { 
+  
+  std::vector<int> pids {};
+  //processes_.clear();
+
+  LinuxParser::Pids(pids);
+
+  // Update processes vector with new processes
+  for (unsigned long i =0; i < pids.size(); i++){
+    //We can use binary_search to speed up since vector is ordered
+    if ( std::find(processes_.begin(), processes_.end(), Process(pids[i])) == processes_.end() ){
+    processes_.push_back(Process((pids[i])));
+    }
+    
+  }  
+
+  // Delete terminated processes
+
+  for (unsigned long i =0; i < processes_.size(); i++){
+    //We can use binary_search to speed up since vector is ordered
+    if ( std::find(pids.begin(), pids.end(), processes_[i].Pid()) == pids.end() ){
+    //processes_.push_back(Process((pids[i])));
+    processes_.erase(processes_.begin()+i);
+    }
+    
+  }  
+
+
+  std::sort(processes_.begin(), processes_.end());
+  return processes_;
+
+ }
 
 // TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() { 
-  string os, version, kernel;
-  string line;
-  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kVersionFilename);
-  if (stream.is_open()) {
-    std::getline(stream, line);
-    std::istringstream linestream(line);
-    linestream >> os >> version >> kernel;
-  }
-  return kernel;
+
+  return LinuxParser::Kernel();
    }
 
 //TODO: Return the system's memory utilization
@@ -45,7 +71,7 @@ float System::MemoryUtilization() {
 std::string System::OperatingSystem() {  return LinuxParser::OperatingSystem(); }
 
 //TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 
 //TODO: Return the total number of processes on the system
 int System::TotalProcesses() { return LinuxParser::TotalProcesses(); }
