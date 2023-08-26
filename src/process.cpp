@@ -57,7 +57,9 @@ float Process::CpuUtilization() {
     return 0.0;
   } else {
     float usage = ((float)deltaTime / (float)sysTicks) / (float)seconds;
-    return usage;
+    //Adjust process usage by dividing by total machine cores
+    float result = usage / (float) sysconf(_SC_NPROCESSORS_ONLN);
+    return result;
   }
 }
 
@@ -75,7 +77,7 @@ string Process::Ram() {
 string Process::User() { 
   std::string user = LinuxParser::User(pid_);
  
-  return fmt::format("{:<8}",LinuxParser::FindUserName(user));
+  return fmt::format("{: <8.8}",LinuxParser::FindUserName(user));
  }
 
 // TODO: Return the age of this process (in seconds)

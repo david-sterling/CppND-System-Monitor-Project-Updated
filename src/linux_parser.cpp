@@ -191,7 +191,7 @@ long LinuxParser::IdleJiffies() {
 }
 
 // TODO: Read and return CPU utilization
-float LinuxParser::CpuUtilization(int pid) { return {}; }
+//float LinuxParser::CpuUtilization(int pid) { return {}; }
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() {

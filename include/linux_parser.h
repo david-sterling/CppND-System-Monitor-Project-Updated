@@ -53,7 +53,7 @@ enum PidStates {
 };
 
 
-float CpuUtilization(int pid);
+//float CpuUtilization(int pid);
 float CpuUtilizationAggregatedInstantaneous();
 long Jiffies();
 long ActiveJiffies();
